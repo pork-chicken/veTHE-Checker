@@ -1,0 +1,4 @@
+pyyaml
+requests
+streamlit
+web3
