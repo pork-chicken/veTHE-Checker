@@ -76,6 +76,9 @@ try:
     # Voted Last Epoch
     voted = contract_instance.functions.voted(tokenid).call()
 
+    # Total Supply
+    totalSupply = contract_instance.functions.totalSupply().call() / 1000000000000000000
+
     # creating a single-element container
     placeholder = st.empty()
 
@@ -86,7 +89,10 @@ try:
             st.markdown("🧾 veTHE Balance: " + str(bal))
             st.markdown("🤑 Estimated BUSD Value: $" + str(THE_price * locked))
             st.markdown("⏲️ Lock End Date: " + str(lockend))
-            st.markdown("🗳️ Voted: " + ["Yes" if voted == True else "No"][0])
+            st.markdown(
+                "🗳️ Vote Share: " + str(round(bal / totalSupply * 100, 4)) + "%"
+            )
+            st.markdown("✔️ Vote Reset: " + ["No" if voted == True else "Yes"][0])
 
     # Note
     st.markdown("#")
@@ -97,7 +103,7 @@ NFA, DYOR -- This web app is in beta, I am not responsible for any information o
         
 BUSD Value is just an estimate of THE Price pulled from Firebird API.
         
-If "Voted" is Yes you cannot sell your veTHE unless you reset your vote.
+:red[If "Vote Reset" is No you cannot sell your veTHE unless you reset your vote.]
         """
     )
 
