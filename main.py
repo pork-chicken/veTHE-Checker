@@ -35,12 +35,9 @@ params = {
 
 try:
     response = requests.get("https://router.firebird.finance/bsc/route", params=params)
-    THE_price = round(
-        response.json()["maxReturn"]["tokens"][
-            "0xf4c8e32eadec4bfe97e0f595add0f4450a863a11"
-        ]["price"],
-        2,
-    )
+    THE_price = response.json()["maxReturn"]["tokens"][
+        "0xf4c8e32eadec4bfe97e0f595add0f4450a863a11"
+    ]["price"]
 except Exception as e:
     print(e)
 
@@ -59,12 +56,12 @@ try:
     # Balance veTHE
     bal = round(
         contract_instance.functions.balanceOfNFT(tokenid).call() / 1000000000000000000,
-        2,
+        4,
     )
 
     # Locked veTHE
     locked = round(
-        contract_instance.functions.locked(tokenid).call()[0] / 1000000000000000000, 2
+        contract_instance.functions.locked(tokenid).call()[0] / 1000000000000000000, 4
     )
 
     # Lock End Date
@@ -87,7 +84,7 @@ try:
         if tokenid:
             st.markdown("🔒 Locked THE: " + str(locked))
             st.markdown("🧾 veTHE Balance: " + str(bal))
-            st.markdown("🤑 Estimated BUSD Value: $" + str(THE_price * locked))
+            st.markdown("🤑 Estimated BUSD Value: $" + str(round(THE_price * locked, 4)))
             st.markdown("⏲️ Lock End Date: " + str(lockend))
             st.markdown(
                 "🗳️ Vote Share: " + str(round(bal / totalSupply * 100, 4)) + "%"
