@@ -1,8 +1,12 @@
 from web3 import Web3
+from datetime import datetime
+from datetime import date
 import time
 import streamlit as st
+from st_btn_select import st_btn_select
 import yaml
 import requests
+import pandas as pd
 
 # App
 st.set_page_config(
@@ -26,6 +30,9 @@ config = read_params(params_path)
 # Title
 st.title("veTHE Checker")
 
+# Select Button
+selection = st_btn_select(("Token ID Wise", "Address Wise"))
+
 # THE Price
 params = {
     "from": "0xF4C8E32EaDEC4BFe97E0F595AdD0f4450a863a11",
@@ -41,69 +48,209 @@ try:
 except Exception as e:
     print(e)
 
-tokenid = st.number_input("Your veTHE Token ID", min_value=1, format="%d")
-
-# Read Data
 try:
     provider_url = config["data"]["provider_url"]
     w3 = Web3(Web3.HTTPProvider(provider_url))
 
-    abi = config["data"]["abi"]
-    contract_address = config["data"]["contract_address"]
+    abi1 = config["data"]["abi1"]
+    contract_address1 = config["data"]["contract_address1"]
+    contract_instance1 = w3.eth.contract(address=contract_address1, abi=abi1)
 
-    contract_instance = w3.eth.contract(address=contract_address, abi=abi)
+    abi2 = config["data"]["abi2"]
+    contract_address2 = config["data"]["contract_address2"]
+    contract_instance2 = w3.eth.contract(address=contract_address2, abi=abi2)
 
-    # Balance veTHE
-    bal = round(
-        contract_instance.functions.balanceOfNFT(tokenid).call() / 1000000000000000000,
-        4,
-    )
+    from dateutil.relativedelta import relativedelta, TH
 
-    # Locked veTHE
-    locked = round(
-        contract_instance.functions.locked(tokenid).call()[0] / 1000000000000000000, 4
-    )
-
-    # Lock End Date
-    lockend = time.strftime(
-        "%Y-%m-%d",
-        time.localtime(int(contract_instance.functions.locked(tokenid).call()[1])),
-    )
-
-    # Voted Last Epoch
-    voted = contract_instance.functions.voted(tokenid).call()
-
-    # Total Supply
-    totalSupply = contract_instance.functions.totalSupply().call() / 1000000000000000000
-
-    # creating a single-element container
-    placeholder = st.empty()
-
-    # Empty Placeholder Filled
-    with placeholder.container():
-        if tokenid:
-            st.markdown("🔒 Locked THE: " + str(locked))
-            st.markdown("🧾 veTHE Balance: " + str(bal))
-            st.markdown("🤑 Estimated BUSD Value: $" + str(round(THE_price * locked, 4)))
-            st.markdown("⏲️ Lock End Date: " + str(lockend))
-            st.markdown(
-                "🗳️ Vote Share: " + str(round(bal / totalSupply * 100, 4)) + "%"
-            )
-            st.markdown("✔️ Vote Reset: " + ["No" if voted == True else "Yes"][0])
-
-    # Note
-    st.markdown("#")
-    st.markdown("#")
-    st.caption(
-        """
-NFA, DYOR -- This web app is in beta, I am not responsible for any information on this page.
-        
-BUSD Value is just an estimate of THE Price pulled from Firebird API.
-        
-:red[If "Vote Reset" is No you cannot sell your veTHE unless you reset your vote.]
-        """
-    )
+    todayDate = date.today()
+    lastThursday = todayDate + relativedelta(weekday=TH(-1))
+    my_time = datetime.min.time()
+    my_datetime = datetime.combine(lastThursday, my_time)
+    currentepoch = int(time.mktime(my_datetime.timetuple()))
 
 except Exception as e:
     print(e)
-    st.markdown("Error Please Try Again")
+
+# Token ID Search
+if selection == "Token ID Wise":
+    tokenid = st.number_input("Your veTHE Token ID", min_value=1, format="%d")
+
+    # Read Data
+    try:
+        # Balance veTHE
+        bal = round(
+            contract_instance1.functions.balanceOfNFT(tokenid).call()
+            / 1000000000000000000,
+            4,
+        )
+
+        # Locked veTHE
+        locked = round(
+            contract_instance1.functions.locked(tokenid).call()[0]
+            / 1000000000000000000,
+            4,
+        )
+
+        # Lock End Date
+        lockend = time.strftime(
+            "%Y-%m-%d",
+            time.localtime(int(contract_instance1.functions.locked(tokenid).call()[1])),
+        )
+
+        # Voted Last Epoch
+        voted = contract_instance1.functions.voted(tokenid).call()
+
+        # Voted Current Epoch
+        votedcurrentepoch = (
+            contract_instance2.functions.lastVoted(tokenid).call() > currentepoch
+        )
+
+        # Total Supply
+        totalSupply = (
+            contract_instance1.functions.totalSupply().call() / 1000000000000000000
+        )
+
+        # creating a single-element container
+        placeholder = st.empty()
+
+        # Empty Placeholder Filled
+        with placeholder.container():
+            if tokenid:
+                st.markdown("🔒 Locked THE: " + str(locked))
+                st.markdown("🧾 veTHE Balance: " + str(bal))
+                st.markdown(
+                    "🤑 Estimated BUSD Value: $" + str(round(THE_price * locked, 4))
+                )
+                st.markdown("⏲️ Lock End Date: " + str(lockend))
+                st.markdown(
+                    "🗳️ Vote Share: " + str(round(bal / totalSupply * 100, 4)) + "%"
+                )
+                st.markdown("✔️ Vote Reset: " + ["No" if voted == True else "Yes"][0])
+                st.markdown(
+                    "⚡ Voted Current Epoch: "
+                    + ["No" if votedcurrentepoch == False else "Yes"][0]
+                )
+
+        # Note
+        st.markdown("#")
+        st.markdown("#")
+        st.caption(
+            """
+    NFA, DYOR -- This web app is in beta, I am not responsible for any information on this page.
+            
+    BUSD Value is just an estimate of THE Price pulled from Firebird API.
+            
+    :red[If "Vote Reset" is No you cannot sell your veTHE unless you reset your vote.]
+            """
+        )
+
+    except Exception as e:
+        print(e)
+        st.markdown("Error Please Try Again")
+
+# Address Search
+if selection == "Address Wise":
+    wallet_address = st.text_input(
+        label="Your wallet address",
+        placeholder="Enter your wallet address",
+        max_chars=42,
+    )
+
+    if wallet_address:
+        # Read Data
+        try:
+            # Checksum Address
+            wallet_address = Web3.toChecksumAddress(wallet_address)
+
+            # veTHE Owner
+            tokenids = []
+            for index in range(100):
+                veTHE = contract_instance1.functions.tokenOfOwnerByIndex(
+                    wallet_address, index
+                ).call()
+                if veTHE > 0:
+                    tokenids.append(veTHE)
+                else:
+                    break
+
+            # veTHE DF
+            tokendata = []
+            for tokenid in tokenids:
+                # Balance veTHE
+                bal = round(
+                    contract_instance1.functions.balanceOfNFT(tokenid).call()
+                    / 1000000000000000000,
+                    4,
+                )
+
+                # Locked veTHE
+                locked = round(
+                    contract_instance1.functions.locked(tokenid).call()[0]
+                    / 1000000000000000000,
+                    4,
+                )
+
+                # Lock End Date
+                lockend = time.strftime(
+                    "%Y-%m-%d",
+                    time.localtime(
+                        int(contract_instance1.functions.locked(tokenid).call()[1])
+                    ),
+                )
+
+                # Voted Last Epoch
+                voted = contract_instance1.functions.voted(tokenid).call()
+
+                # Voted Current Epoch
+                votedcurrentepoch = (
+                    contract_instance2.functions.lastVoted(tokenid).call()
+                    > currentepoch
+                )
+
+                # Total Supply
+                totalSupply = (
+                    contract_instance1.functions.totalSupply().call()
+                    / 1000000000000000000
+                )
+
+                tokendata.append(
+                    {
+                        "🔢 Token ID": tokenid,
+                        "🔒 Locked THE": locked,
+                        "🧾 veTHE Balance": bal,
+                        "🤑 Estimated BUSD Value $": round(THE_price * locked, 4),
+                        "⏲️ Lock End Date": lockend,
+                        "🗳️ Vote Share %": round(bal / totalSupply * 100, 4),
+                        "✔️ Vote Reset": ["No" if voted == True else "Yes"][0],
+                        "⚡ Voted Current Epoch": [
+                            "No" if votedcurrentepoch == False else "Yes"
+                        ][0],
+                    }
+                )
+
+            veTHE_df = pd.DataFrame(tokendata)
+
+            # creating a single-element container
+            placeholder = st.empty()
+
+            # Empty Placeholder Filled
+            with placeholder.container():
+                if wallet_address:
+                    st.dataframe(veTHE_df)
+
+            # Note
+            st.markdown("#")
+            st.markdown("#")
+            st.caption(
+                """
+        NFA, DYOR -- This web app is in beta, I am not responsible for any information on this page.
+                
+        BUSD Value is just an estimate of THE Price pulled from Firebird API.
+                
+        :red[If "Vote Reset" is No you cannot sell your veTHE unless you reset your vote.]
+                """
+            )
+
+        except Exception as e:
+            print(e)
+            st.markdown("Error Please Try Again")
