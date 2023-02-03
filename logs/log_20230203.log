@@ -2,3 +2,5 @@
 [2023-02-03 14:02:01,845] 	ERROR 	143 	scrape.py 	<module>() 	Error occurred while scraping Error: 'top_holders_sheets_url'
 [2023-02-03 14:05:07,759] 	INFO 	43 	scrape.py 	<module>() 	Scrape Started
 [2023-02-03 14:05:07,759] 	ERROR 	143 	scrape.py 	<module>() 	Error occurred while scraping Error: 'top_holders_sheets_url'
+[2023-02-03 14:07:00,567] 	INFO 	43 	scrape.py 	<module>() 	Scrape Started
+[2023-02-03 14:07:56,231] 	INFO 	141 	scrape.py 	<module>() 	Scrape Successful
