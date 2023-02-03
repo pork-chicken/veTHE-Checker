@@ -48,8 +48,8 @@ try:
     provider_url = config["data"]["provider_url"]
     w3 = Web3(Web3.HTTPProvider(provider_url))
 
-    abi = config["data"]["abi"]
-    contract_address = config["data"]["contract_address"]
+    abi = config["data"]["abi1"]
+    contract_address = config["data"]["contract_address1"]
 
     contract_instance = w3.eth.contract(address=contract_address, abi=abi)
 
