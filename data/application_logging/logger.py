@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 import os
-import shutil
 LOG_DIR = "logs"
 TIMESTAMP = datetime.now().strftime("%Y%m%d")
 
