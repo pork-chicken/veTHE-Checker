@@ -28,3 +28,5 @@
 [2023-02-05 08:36:37,881] 	INFO 	141 	scrape.py 	<module>() 	Scrape Successful
 [2023-02-05 09:07:32,621] 	INFO 	43 	scrape.py 	<module>() 	Scrape Started
 [2023-02-05 09:08:34,491] 	INFO 	141 	scrape.py 	<module>() 	Scrape Successful
+[2023-02-05 09:32:37,608] 	INFO 	43 	scrape.py 	<module>() 	Scrape Started
+[2023-02-05 09:34:42,104] 	INFO 	141 	scrape.py 	<module>() 	Scrape Successful
