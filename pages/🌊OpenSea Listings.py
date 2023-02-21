@@ -39,8 +39,9 @@ listings_data = response.json()
 ## Pandas Manipulation
 listings_df = pd.DataFrame(listings_data)
 listings_df = listings_df[listings_df["veLocked"] > 0]
+listings_df["💸 Potential Profit in USD"] = listings_df["valueUSD"] - listings_df["listedPriceUSD"]
 listings_df["⏲️ Lock End Date"] = listings_df["veLockedTimestamp"].apply(lambda x: time.strftime("%Y-%m-%d", time.gmtime(int(x))))
-listings_df["🛒 Discount %"] = (listings_df["valueUSD"] - listings_df["listedPriceUSD"]) / listings_df["valueUSD"]
+listings_df["🛒 Discount %"] = (listings_df["valueUSD"] - listings_df["listedPriceUSD"]) / listings_df["valueUSD"] * 100
 listings_df.sort_values(by="🛒 Discount %", ascending=False, inplace=True)
 listings_df["🔗 OS Link"] = listings_df["id"].apply(lambda x: '<a href="https://opensea.io/assets/bsc/0xfbbf371c9b0b994eebfcc977cef603f7f31c070d/' + str(x) + '">OS Link</a>')
 listings_df.drop(
@@ -66,6 +67,7 @@ listings_df.columns = [
     "🤑 veTHE Value in USD",
     "🧾 veTHE Balance",
     "🔒 Locked THE",
+    "💸 Potential Profit in USD",
     "⏲️ Lock End Date",
     "🛒 Discount %",
     "🔗 OS Link",
@@ -79,6 +81,7 @@ listings_df = listings_df[
         "⏲️ Lock End Date",
         "🟨 Sale Price in BNB",
         "💰 Sale Price in USD",
+        "💸 Potential Profit in USD",
         "🛒 Discount %",
         "🔗 OS Link",
     ]
@@ -101,7 +104,7 @@ NFA, DYOR -- This web app is in beta, I am not responsible for any information o
 
 :red[The above list excludes veTHE which has not been vote reset or the locked value is very little or dust.]
 
-:red[Negative Discount = Bad Deal = ngmi]
+:red[Negative Discount/Profit = Bad Deal = ngmi]
     
 Special Thanks to **CryptoCult** for creating and providing access to the Listings API.
             """
