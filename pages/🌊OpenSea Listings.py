@@ -38,7 +38,7 @@ listings_data = response.json()
 
 ## Pandas Manipulation
 listings_df = pd.DataFrame(listings_data)
-listings_df = listings_df[listings_df["veLocked"] > 0]
+listings_df = listings_df[listings_df["veLocked"] >= 1]
 listings_df["💸 Potential Profit in USD"] = listings_df["valueUSD"] - listings_df["listedPriceUSD"]
 listings_df["⏲️ Lock End Date"] = listings_df["veLockedTimestamp"].apply(lambda x: time.strftime("%Y-%m-%d", time.gmtime(int(x))))
 listings_df["🛒 Discount %"] = (listings_df["valueUSD"] - listings_df["listedPriceUSD"]) / listings_df["valueUSD"] * 100
