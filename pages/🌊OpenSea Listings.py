@@ -42,24 +42,8 @@ listings_df = listings_df[listings_df["veLocked"] >= 1]
 listings_df["💸 Potential Profit in USD"] = listings_df["valueUSD"] - listings_df["listedPriceUSD"]
 listings_df["⏲️ Lock End Date"] = listings_df["veLockedTimestamp"].apply(lambda x: time.strftime("%Y-%m-%d", time.gmtime(int(x))))
 listings_df["🛒 Discount %"] = (listings_df["valueUSD"] - listings_df["listedPriceUSD"]) / listings_df["valueUSD"] * 100
-listings_df.sort_values(by="🛒 Discount %", ascending=False, inplace=True)
 listings_df["🔗 OS Link"] = listings_df["id"].apply(lambda x: '<a href="https://opensea.io/assets/bsc/0xfbbf371c9b0b994eebfcc977cef603f7f31c070d/' + str(x) + '">OS Link</a>')
-listings_df.drop(
-    columns=[
-        "_id",
-        "status",
-        "listedThePrice",
-        "currentThePrice",
-        "currentBnbPrice",
-        "veLockedEnd",
-        "veLockedTimestamp",
-        "voteLocked",
-        "timeStamp",
-        "events",
-        "original",
-    ],
-    inplace=True,
-)
+listings_df = listings_df[["id", "listedPriceBNB", "listedPriceUSD", "valueUSD", "veBalance", "veLocked", "💸 Potential Profit in USD", "⏲️ Lock End Date", "🛒 Discount %", "🔗 OS Link"]]
 listings_df.columns = [
     "🔢 Token ID",
     "🟨 Sale Price in BNB",
@@ -86,6 +70,7 @@ listings_df = listings_df[
         "🔗 OS Link",
     ]
 ]
+listings_df.sort_values(by="🛒 Discount %", ascending=False, inplace=True)
 
 # creating a single-element container
 placeholder = st.empty()
