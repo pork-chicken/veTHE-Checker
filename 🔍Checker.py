@@ -1,6 +1,6 @@
 from web3 import Web3
-from datetime import datetime, date, timezone
-from dateutil.relativedelta import relativedelta, TH
+# from datetime import datetime, date, timezone
+# from dateutil.relativedelta import relativedelta, TH
 import time
 import streamlit as st
 from st_btn_select import st_btn_select
@@ -35,14 +35,14 @@ selection = st_btn_select(("Token ID", "Address"))
 
 # THE Price
 params = {
-    "from": "0xF4C8E32EaDEC4BFe97E0F595AdD0f4450a863a11",
-    "to": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+    "from": "0x463913D3a3D3D291667D53B8325c598Eb88D3B0e",
+    "to": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
     "amount": "1000000000000000000",
 }
 
 try:
-    response = requests.get("https://router.firebird.finance/bsc/route", params=params)
-    THE_price = response.json()["maxReturn"]["tokens"]["0xf4c8e32eadec4bfe97e0f595add0f4450a863a11"]["price"]
+    response = requests.get("https://router.firebird.finance/arbitrum/route", params=params)
+    THE_price = response.json()["maxReturn"]["tokens"]["0x463913D3a3D3D291667D53B8325c598Eb88D3B0e"]["price"]
 except Exception as e:
     print(e)
 
@@ -63,7 +63,7 @@ try:
     contract_instance3 = w3.eth.contract(address=contract_address3, abi=abi3)
 
     # Total Supply
-    totalSupply = contract_instance3.functions.balanceOf("0xfBBF371C9B0B994EebFcC977CEf603F7f31c070D").call() / 1000000000000000000
+    totalSupply = contract_instance3.functions.balanceOf("0x29d3622c78615A1E7459e4bE434d816b7de293e4").call() / 1000000000000000000
 
     # todayDate = datetime.utcnow()
     # lastThursday = todayDate + relativedelta(weekday=TH(-1))
